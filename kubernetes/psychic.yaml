@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psychic
+  labels:
+    app: psychic
+spec:
+  selector:
+    matchLabels:
+      app: psychic
+  template:
+    metadata:
+      labels:
+        app: psychic
+    spec:
+      containers:
+        - name: psychic
+          image: psychic-image
+          ports:
+            - containerPort: 8080
