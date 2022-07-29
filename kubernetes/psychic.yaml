@@ -18,3 +18,31 @@ spec:
           image: psychic-image
           ports:
             - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-subdomain
+spec:
+  selector:
+    name: psychic
+  clusterIP: None
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: psychic-pod
+  labels:
+    name: psychic
+spec:
+  hostname: psychic-pod
+  subdomain: default-subdomain
+  containers:
+  - image: psychic-image
+    ports:
+      - containerPort: 8080
+    name: psychic-pod

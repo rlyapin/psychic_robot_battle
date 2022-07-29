@@ -1,30 +1,45 @@
 <script>
+
+  async function callPred() {
+    let response = await fetch(`/apis/predict?history=${api_request}`,
+                               {"headers": {"content-type": "application/json", "accept": "application/json"}});
+    let pred = await response.text();
+    return pred
+  }
+
   let uuid = crypto.randomUUID();
   let score = 0;
-  let pred = "L";
+
+  let pred = "N/A";
+
   let click_history = [];
   let score_history = [];
+  $: api_request = click_history.reduce((x, y) => x + y, "");
 
-  function userClick(button) {
-    score += 1 - 2 * (button == pred);
+  async function userClick(button) {
+    pred = await callPred();
+    score += 1 - 2 * (button === pred);
     click_history = [...click_history.slice(-24), button];
     score_history = [...score_history, score];
   }
 </script>
 
-<p>Please click any button you like (do not forget to block your mind as you do it!)</p> 
-<p>Every time evil robot correctly predicts your pick you lose 1 point, every time robot is fooled you get 1 point back.</p>
-
-<button on:click={() => userClick("L")}>
+<button on:click={async () => await userClick("L")}>
   Left
 </button>
 
-<button on:click={() => userClick("R")}>
+<button on:click={async () => await userClick("R")}>
   Right
 </button>
 
 <p> Your score: {score} </p>
 
-<p> Your click history (25 latest clicks): {click_history} </p>
+<p> Your click history (25 latest clicks): {api_request} </p>
+
+{#await pred}
+  <p>...waiting</p>
+{:then data}
+  <p> Last robot prediction: {data} </p>
+{/await}
 
 <p> Session cookie: {uuid} </p>

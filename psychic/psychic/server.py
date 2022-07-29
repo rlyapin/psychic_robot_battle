@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from .model import Psychic
 
@@ -9,6 +10,7 @@ def read_root():
     return {"msg": "Launched ML psychic model"}
 
 
-@app.get("/predict/{history}")
-def predict(history: str):
+@app.get("/predict/")
+async def predict(history: str):
+    logging.info(f"Received predict request for {history}")
     return {"pred": psychic.predict(history)}
