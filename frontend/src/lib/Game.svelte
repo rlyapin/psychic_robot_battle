@@ -7,6 +7,14 @@
     return pred
   }
 
+  async function log(button) {
+    let response = await fetch(`/apis/log?session=${uuid}&click=${button}&pred=${pred}`,
+                               {"method": "POST", 
+                                "headers": {"content-type": "application/json", "accept": "application/json"}});
+    let result = await response.text();
+    return result
+  }
+
   let uuid = crypto.randomUUID();
   let score = 0;
 
@@ -21,6 +29,7 @@
     score += 1 - 2 * (button === pred);
     click_history = [...click_history.slice(-24), button];
     score_history = [...score_history, score];
+    await log(button);
   }
 </script>
 

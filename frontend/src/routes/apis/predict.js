@@ -1,5 +1,5 @@
 export async function GET({ url }) {
-	const history = url.searchParams.get("history")
+    const history = url.searchParams.get("history")
     console.log(history)
 
     // TODO: move info about model info to kubernetes configs and instead load environment variables

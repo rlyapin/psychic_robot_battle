@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            value: pgadmin@pgadmin.com
+          - name: PGADMIN_DEFAULT_PASSWORD
+            value: pgadmin
+          - name: PGADMIN_PORT
+            value: "80"
+        image: dpage/pgadmin4
+        name: pgadmin
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            memory: 256Mi
