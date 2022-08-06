@@ -10,12 +10,50 @@ spec:
 ---
 
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: timescaledb-pv
+spec:
+  storageClassName: ""
+  claimRef:
+    name: timescalesb-pvc
+    namespace: default
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/psql"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: timescalesb-pvc
+  namespace: default
+spec:
+  storageClassName: ""
+  volumeName: timescaledb-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
 kind: Pod
 metadata:
   name: timescaledb-pod
   labels:
     name: timescaledb
 spec:
+  volumes:
+    - name: timescaledb-pv
+      persistentVolumeClaim:
+        claimName: timescalesb-pvc
   hostname: timescaledb-pod
   subdomain: timescaledb-service
   containers:
@@ -39,3 +77,6 @@ spec:
         secretKeyRef:
           name: timescaledb-secrets
           key: POSTGRES_PASSWORD
+    volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: timescaledb-pv
