@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: timescaledb-service
+  name: timescaledb
+  labels:
+    app: timescaledb
 spec:
   selector:
-    name: timescaledb
+    app: timescaledb
   clusterIP: None
 
 ---
@@ -14,12 +16,9 @@ kind: PersistentVolume
 metadata:
   name: timescaledb-pv
 spec:
-  storageClassName: ""
-  claimRef:
-    name: timescalesb-pvc
-    namespace: default
+  storageClassName: timescaledb-lsc
   capacity:
-    storage: 1Gi
+    storage: 4Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -27,56 +26,61 @@ spec:
 
 ---
 
-apiVersion: v1
-kind: PersistentVolumeClaim
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: timescalesb-pvc
-  namespace: default
-spec:
-  storageClassName: ""
-  volumeName: timescaledb-pv
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
+  name: timescaledb-lsc
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
 
 ---
 
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  name: timescaledb-pod
-  labels:
-    name: timescaledb
+  name: timescaledb
 spec:
-  volumes:
-    - name: timescaledb-pv
-      persistentVolumeClaim:
-        claimName: timescalesb-pvc
-  hostname: timescaledb-pod
-  subdomain: timescaledb-service
-  containers:
-  - image: timescaledb-image
-    ports:
-      - containerPort: 5432
-    name: timescaledb-pod
-    env:
-    - name: POSTGRES_DB
-      valueFrom:
-        secretKeyRef:
-          name: timescaledb-secrets
-          key: POSTGRES_DB
-    - name: POSTGRES_USER
-      valueFrom:
-        secretKeyRef:
-          name: timescaledb-secrets
-          key: POSTGRES_USER
-    - name: POSTGRES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: timescaledb-secrets
-          key: POSTGRES_PASSWORD
-    volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: timescaledb-pv
+  selector:
+    matchLabels:
+      app: timescaledb
+  replicas: 1
+  serviceName: "timescaledb"
+  template:
+    metadata:
+      labels:
+        app: timescaledb
+    spec:
+      containers:
+      - image: timescaledb-image
+        ports:
+          - containerPort: 5432
+        name: timescaledb
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-secrets
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: timescaledb-secrets
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: timescaledb-pv
+  volumeClaimTemplates:
+  - metadata:
+      name: timescaledb-pv
+    spec:
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: timescaledb-lsc
+      resources:
+        requests:
+          storage: 1Gi

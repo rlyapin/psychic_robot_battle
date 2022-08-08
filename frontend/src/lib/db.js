@@ -9,7 +9,7 @@ const pool = new pg.Pool({
   database: db,
   user: user,
   password: pwd,
-  host: "timescaledb-pod.timescaledb-service.default.svc.cluster.local",
+  host: "timescaledb.default.svc.cluster.local",
   port: 5432,
 });
 
