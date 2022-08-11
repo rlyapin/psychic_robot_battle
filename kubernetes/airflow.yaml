@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: airflow
+  template:
+    metadata:
+      labels:
+        name: airflow
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - name: airflow-webserver
+        image: airflow-image
+        command: ["airflow", "webserver", "-p", "8000"]
+        envFrom:
+        - secretRef:
+            name: timescaledb-secrets
+        env:
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_AIRFLOW_DB)"
+
+      - name: airflow-scheduler
+        image: airflow-image
+        command: ["airflow", "scheduler"]
+        envFrom:
+        - secretRef:
+            name: timescaledb-secrets
+        env:
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_AIRFLOW_DB)"
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: LocalExecutor
+
+      initContainers:
+      - name: airflow-init
+        image: airflow-image
+        envFrom:
+        - secretRef:
+            name: timescaledb-secrets
+        - secretRef:
+            name: airflow-webserver-secrets           
+        env:
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_AIRFLOW_DB)"
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - >-
+              airflow db upgrade &&
+              airflow users create
+              -u $(WEBSERVER_USER)
+              -p $(WEBSERVER_PASSWORD)
+              -r $(WEBSERVER_ROLE)
+              -e $(WEBSERVER_EMAIL)
+              -f $(WEBSERVER_FIRST_NAME)
+              -l $(WEBSERVER_LAST_NAME)
+
