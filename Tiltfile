@@ -1,7 +1,7 @@
 docker_build('frontend-image', 'frontend')
 docker_build('psychic-image', 'psychic')
 docker_build('timescaledb-image', 'timescaledb')
-docker_build('airflow-image', 'airflow')
+docker_build('airflow-image', 'airflow', extra_tag=['latest'])
 
 k8s_yaml('kubernetes/secrets/timescaledb.yaml')
 k8s_yaml('kubernetes/secrets/pgadmin.yaml')
