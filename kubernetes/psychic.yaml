@@ -1,25 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psychic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psychic
+  template:
+    metadata:
+      name: psychic
+      labels:
+        app: psychic
+    spec:
+      containers:
+        - name: psychic
+          image: psychic-image
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+
+---
+
 apiVersion: v1
 kind: Service
 metadata:
   name: psychic
 spec:
   selector:
-    name: psychic
-  clusterIP: None
+    app: psychic
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 
----
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: psychic
-  labels:
-    name: psychic
-spec:
-  hostname: psychic
-  subdomain: psychic
-  containers:
-  - image: psychic-image
-    ports:
-      - containerPort: 8080
-    name: psychic
