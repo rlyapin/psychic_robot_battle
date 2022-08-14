@@ -8,7 +8,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: base
-      image: airflow-image:latest
+      image: airflow-worker-image:latest
       imagePullPolicy: IfNotPresent
       envFrom:
       - secretRef:

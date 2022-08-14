@@ -14,6 +14,9 @@ rules:
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "patch", "watch", "create", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch"]
 
 ---
 
@@ -75,12 +78,6 @@ spec:
           value: KubernetesExecutor
         - name: AIRFLOW__KUBERNETES__POD_TEMPLATE_FILE
           value: /opt/airflow/pod_template_file.yaml
-        - name: AIRFLOW__KUBERNETES__IN_CLUSTER
-          value: 'true'
-        - name: AIRFLOW__KUBERNETES__DAGS_IN_IMAGE
-          value: 'true'
-        - name: AIRFLOW__KUBERNETES__RUN_AS_USER
-          value: '50000'
 
       initContainers:
       - name: airflow-init
@@ -89,7 +86,7 @@ spec:
         - secretRef:
             name: timescaledb-secrets
         - secretRef:
-            name: airflow-webserver-secrets           
+            name: airflow-webserver-secrets
         env:
         - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
           value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_AIRFLOW_DB)"
