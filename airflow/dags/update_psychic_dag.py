@@ -2,8 +2,7 @@ import datetime
 import pendulum
 import os
 from airflow import DAG
-from airflow.decorators import task
-from airflow.operators.empty import EmptyOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
 
 
@@ -41,4 +40,9 @@ dag =  DAG(
     is_paused_upon_creation=False
 )
 
+run_stats = PostgresOperator(task_id="calculate_click_stats",
+                             postgres_conn_id="psychic_db",
+                             sql="sql/calculate_click_probs.sql", 
+                             dag=dag)
 run_restart = PythonOperator(task_id="restart_psychic", python_callable=restart_psychic, dag=dag)
+run_stats >> run_restart
