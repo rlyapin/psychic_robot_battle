@@ -11,31 +11,6 @@ spec:
 
 ---
 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: timescaledb-pv
-spec:
-  storageClassName: timescaledb-lsc
-  capacity:
-    storage: 4Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/data/psql"
-
----
-
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: timescaledb-lsc
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
-allowVolumeExpansion: true
-
----
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -52,21 +27,13 @@ spec:
         app: timescaledb
     spec:
       containers:
-      - image: timescaledb-image
+      - name: timescaledb
+        image: timescaledb-image
         ports:
           - containerPort: 5432
-        name: timescaledb
-        env:
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: timescaledb-secrets
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: timescaledb-secrets
-              key: POSTGRES_PASSWORD
+        envFrom:
+        - secretRef:
+            name: timescaledb-secrets
         volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: timescaledb-pv

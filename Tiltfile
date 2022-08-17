@@ -7,6 +7,8 @@ k8s_yaml('kubernetes/secrets/timescaledb.yaml')
 k8s_yaml('kubernetes/secrets/pgadmin.yaml')
 k8s_yaml('kubernetes/secrets/airflow.yaml')
 
+k8s_yaml('kubernetes/volumes/timescaledb.yaml')
+
 k8s_yaml('kubernetes/frontend.yaml')
 k8s_yaml('kubernetes/psychic.yaml')
 k8s_yaml('kubernetes/timescaledb.yaml')
