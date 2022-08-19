@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 import { connectToDB } from '$lib/db';
 
 export async function POST({ url }) {
@@ -15,7 +16,5 @@ export async function POST({ url }) {
         client.release();
     });
 
-    return {
-        body: {message: "ok"}
-    };
+    return json({message: "ok"});
 }

@@ -21,3 +21,8 @@ spec:
           envFrom:
           - secretRef:
               name: timescaledb-secrets
+          - secretRef:
+              name: redis-secrets
+          env:
+            - name: REDIS_URI
+              value: "redis://$(REDIS_USER):$(REDIS_PASSWORD)@$(REDIS_HOSTNAME):$(REDIS_PORT)/$(REDIS_DBNUM)"
