@@ -13,8 +13,12 @@ spec:
       envFrom:
       - secretRef:
           name: timescaledb-secrets
+      - secretRef:
+          name: redis-secrets
       env:
         - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
           value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_AIRFLOW_DB)"
         - name: AIRFLOW_CONN_PSYCHIC_DB
           value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOSTNAME):$(POSTGRES_PORT)/$(POSTGRES_PSYCHIC_DB)"
+        - name: AIRFLOW_CONN_REDIS
+          value: "redis://$(REDIS_USER):$(REDIS_PASSWORD)@$(REDIS_HOSTNAME):$(REDIS_PORT)/$(REDIS_DBNUM)"
