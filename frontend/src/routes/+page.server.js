@@ -1,14 +1,14 @@
 import { error } from '@sveltejs/kit';
-import { connectToRedis } from '$lib/redis';
- 
+import { hGetAllRedisAsync } from '$lib/redis';
+
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
-  const redis_client = await connectToRedis();
-  const stats = await redis_client.hGetAll('psychic_stats');
+  const stats = await hGetAllRedisAsync('psychic_stats');
+  const parsed_stats = JSON.parse(JSON.stringify(stats));
 
-  if (stats) {
-    return stats;
+  if (parsed_stats) {
+    return parsed_stats;
   }
  
-  throw error(404, 'Not found');
+  throw error(404, 'App cannot find ML service stats');
 }

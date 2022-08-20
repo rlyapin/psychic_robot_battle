@@ -1,5 +1,8 @@
 <script>
   import Game from '$lib/Game.svelte'
+  /** @type {import('./$types').PageData} */
+  export let data;
+  console.log(data)
 </script>
 
 <h1>Psychic Robot Battle</h1>

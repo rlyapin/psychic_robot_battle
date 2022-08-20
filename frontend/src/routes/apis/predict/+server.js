@@ -1,5 +1,3 @@
-import { json as json$1 } from '@sveltejs/kit';
-
 export async function GET({ url }) {
     const history = url.searchParams.get("history")
     console.log(history)
@@ -13,9 +11,9 @@ export async function GET({ url }) {
 
     const pred = result.pred;
 
-    return new Response(JSON.stringify(pred), {
+    return new Response(pred, {
         headers: {
-            'content-type': 'application/json; charset=utf-8'
+            'content-type': 'application/json; charset=utf-8',
             'access-control-allow-origin': '*'
         }
     });

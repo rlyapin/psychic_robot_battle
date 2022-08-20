@@ -1,9 +1,19 @@
-import createClient from "redis";
+import { createClient } from "redis";
 
-const client = createClient({
-  url: process.env.REDIS_URI
+export const redisClient = createClient({
+  url: process.env.REDIS_URI,
 });
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+(async () => {
+   redisClient.on('error', (err) => console.log(err));
+   await redisClient.connect();
+})();
 
-export const connectToRedis = async () => await client.connect();
+export const hGetAllRedisAsync = async (key) => {
+   const value = await redisClient.hGetAll(key);
+   return value;
+};
+
+export const setRedisAsync = async (key, value) => {
+   await redisClient.set(key, value);
+};
