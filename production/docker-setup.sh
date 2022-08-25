@@ -43,9 +43,10 @@ systemctl daemon-reload
 systemctl enable cri-docker.service
 systemctl enable --now cri-docker.socket
 
-# Extra step to prepare for local docker registry: https://docs.docker.com/registry/insecure/
 # https://stackoverflow.com/questions/43794169/docker-change-cgroup-driver-to-systemd
-echo "{ \"insecure-registries\" : [\"10.0.0.2:5000\"], \"exec-opts\": [\"native.cgroupdriver=systemd\"] }" > /etc/docker/daemon.json
+# Extra step to prepare for local docker registry: https://docs.docker.com/registry/insecure/
+# localhost:31000 = NodeIP:NodePort for deployed k8s NodePort registry service
+echo "{ \"insecure-registries\" : [\"localhost:31000\"], \"exec-opts\": [\"native.cgroupdriver=systemd\"] }" > /etc/docker/daemon.json
 systemctl restart docker
 
 # Following instructions from:
