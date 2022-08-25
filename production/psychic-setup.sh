@@ -12,9 +12,14 @@ docker build psychic_robot_battle/psychic -t localhost:31000/psychic-image
 docker push localhost:31000/timescaledb-image
 docker push localhost:31000/redis-image
 docker push localhost:31000/airflow-image
+docker push localhost:31000/airflow-worker-image
 docker push localhost:31000/frontend-image
 docker push localhost:31000/psychic-image
 
+awk -i inplace 'BEGIN{"openssl rand -hex 16" | getline pwd}  {sub(/PleaseChangeMe/, pwd ); print}' \
+psychic_robot_battle/kubernetes/secrets/timescaledb.yaml \
+psychic_robot_battle/kubernetes/secrets/airflow.yaml \
+psychic_robot_battle/kubernetes/secrets/redis.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/secrets/timescaledb.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/secrets/airflow.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/secrets/redis.yaml
@@ -35,7 +40,8 @@ sed -i -e 's=airflow-worker-image=localhost:31000/airflow-worker-image=g' psychi
 
 kubectl apply -f psychic_robot_battle/kubernetes/services/timescaledb.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/services/redis.yaml
-kubectl wait --for=condition=available --timeout=60s --all deployments
+kubectl wait pods --selector app=timescaledb --for condition=Ready
+kubectl wait pods --selector app=redis --for condition=Ready
 
 kubectl apply -f psychic_robot_battle/kubernetes/services/airflow.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/services/psychic.yaml

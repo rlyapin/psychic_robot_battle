@@ -13,7 +13,6 @@ spec:
       labels:
         app: local-registry
     spec:
-      hostNetwork: true
       containers:
         - name: local-registry
           image: registry:2

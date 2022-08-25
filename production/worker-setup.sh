@@ -49,13 +49,14 @@ systemctl enable --now cri-docker.socket
 echo "{ \"insecure-registries\" : [\"localhost:31000\"], \"exec-opts\": [\"native.cgroupdriver=systemd\"] }" > /etc/docker/daemon.json
 systemctl restart docker
 
-# Following instructions from:
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
-# https://github.com/containerd/containerd/blob/main/docs/getting-started.md#customizing-containerd
-# Creating containerd config
-# mkdir -p /etc/containerd
-# containerd config default > /etc/containerd/config.toml
+# Following instructions from https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
 
-# Configuring the systemd cgroup driver
-# sed -i -e 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-# sudo systemctl restart containerd
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
