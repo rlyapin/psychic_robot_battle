@@ -5,6 +5,7 @@ kubectl wait --for=condition=available --timeout=60s --all deployments
 
 docker build psychic_robot_battle/timescaledb -t localhost:31000/timescaledb-image
 docker build psychic_robot_battle/redis -t localhost:31000/redis-image
+sed -i -e 's=airflow-worker-image=localhost:31000/airflow-worker-image=g' psychic_robot_battle/airflow/pod_template_file.yaml
 docker build psychic_robot_battle/airflow -t localhost:31000/airflow-image -t localhost:31000/airflow-worker-image
 docker build psychic_robot_battle/frontend -t localhost:31000/frontend-image
 docker build psychic_robot_battle/psychic -t localhost:31000/psychic-image
@@ -36,7 +37,6 @@ sed -i -e 's=redis-image=localhost:31000/redis-image=g' psychic_robot_battle/kub
 sed -i -e 's=psychic-image=localhost:31000/psychic-image=g' psychic_robot_battle/kubernetes/services/psychic.yaml
 sed -i -e 's=frontend-image=localhost:31000/frontend-image=g' psychic_robot_battle/kubernetes/services/frontend.yaml
 sed -i -e 's=airflow-image=localhost:31000/airflow-image=g' psychic_robot_battle/kubernetes/services/airflow.yaml
-sed -i -e 's=airflow-worker-image=localhost:31000/airflow-worker-image=g' psychic_robot_battle/airflow/pod_template_file.yaml
 
 kubectl apply -f psychic_robot_battle/kubernetes/services/timescaledb.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/services/redis.yaml
