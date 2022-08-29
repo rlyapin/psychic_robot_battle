@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Loading external ip for cluster
+external_ip=$1
+
 # Following instructions from https://docs.docker.com/engine/install/ubuntu/
 # Install docker-ce
 sudo apt-get update
@@ -60,3 +63,15 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
+# Setting persistent floating ip as advised in https://community.hetzner.com/tutorials/install-kubernetes-cluster
+# Using recent instructions from https://docs.hetzner.com/cloud/floating-ips/persistent-configuration#ubuntu-2004
+cat > /etc/netplan/60-floating-ip.yaml <<EOF
+network:
+   version: 2
+   renderer: networkd
+   ethernets:
+     eth0:
+       addresses:
+       - $external_ip/32
+EOF
+sudo netplan apply
