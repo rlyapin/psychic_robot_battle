@@ -59,8 +59,10 @@ sed -e "s/strictARP: false/strictARP: true/" | \
 kubectl apply -f - -n kube-system
 
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-native.yaml
+kubectl wait --for=condition=available --timeout=60s --all deployments
 sed -i -e "s=EXTERNAL_IP=$external_ip=g" psychic_robot_battle/kubernetes/ingress/metallb.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/ingress/metallb.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+kubectl wait --for=condition=available --timeout=60s --all deployments
 kubectl apply -f psychic_robot_battle/kubernetes/ingress/frontend.yaml
