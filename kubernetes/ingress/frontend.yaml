@@ -4,12 +4,17 @@ metadata:
   name: frontend-ingress
   annotations:
      kubernetes.io/ingress.class: nginx
-     nginx.ingress.kubernetes.io/rewrite-target: /
+     cert-manager.io/issuer: "letsencrypt-DEPLOYMODE"
 spec:
+  tls:
+  - hosts:
+    - rlyapin.com
+    secretName: letsencrypt-DEPLOYMODE-tls
   rules:
-  - http:
+  - host: rlyapin.com
+    http:
       paths:
-      - path: /psychic_robot_battle
+      - path: /
         pathType: Prefix
         backend:
           service:

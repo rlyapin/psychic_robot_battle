@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Loading external ip for cluster
+# Loading external ip for cluster, email for TLS setup and mode for staging/prod deployment
 external_ip=$1
+email=$2
+deploymode=$3
 
 kubectl apply -f psychic_robot_battle/kubernetes/services/registry.yaml
 kubectl wait --for=condition=available --timeout=60s --all deployments
@@ -53,6 +55,12 @@ kubectl wait --for=condition=available --timeout=300s --all deployments
 kubectl apply -f psychic_robot_battle/kubernetes/services/frontend.yaml
 kubectl wait --for=condition=available --timeout=60s --all deployments
 
+# Setting up certificate management as in https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
+kubectl wait --for=condition=available --timeout=60s --all deployments --all-namespaces
+sed -i -e "s=PleaseChangeMe=$email=g" psychic_robot_battle/kubernetes/ingress/letsencrypt.yaml
+kubectl apply -f psychic_robot_battle/kubernetes/ingress/letsencrypt.yaml
+
 # Following https://metallb.universe.tf/installation/
 kubectl get configmap kube-proxy -n kube-system -o yaml | \
 sed -e "s/strictARP: false/strictARP: true/" | \
@@ -65,4 +73,5 @@ kubectl apply -f psychic_robot_battle/kubernetes/ingress/metallb.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=ingress-nginx -l app.kubernetes.io/component=controller -n ingress-nginx
+sed -i -e "s=DEPLOYMODE=$deploymode=g" psychic_robot_battle/kubernetes/ingress/frontend.yaml
 kubectl apply -f psychic_robot_battle/kubernetes/ingress/frontend.yaml
