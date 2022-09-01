@@ -28,18 +28,24 @@
     pred = await callPred();
     score += 1 - 2 * (button === pred);
     click_history = [...click_history.slice(-24), button];
-    score_history = [...score_history, score];
+    score_history = [...score_history.slice(-24), score];
     await log(button);
   }
 </script>
 
-<button on:click={async () => await userClick("L")}>
-  Left
-</button>
+<p>Please click any button you like (do not forget to block your mind as you do it!)</p>
 
-<button on:click={async () => await userClick("R")}>
-  Right
-</button>
+<div class="centre">
+  <button on:click={async () => await userClick("L")}>
+    Left
+  </button>
+
+  <button on:click={async () => await userClick("R")}>
+    Right
+  </button>
+</div>
+
+<p>Every time evil robot correctly predicts your pick you lose 1 point, every time robot is fooled you get 1 point back.</p>
 
 <p> Your score: {score} </p>
 
