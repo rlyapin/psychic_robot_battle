@@ -1,12 +1,15 @@
 FROM node:16-alpine as build
 
 # install dependencies
+RUN apk --no-cache add curl
+
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # Copy all local files into the image.
 COPY . .
+RUN curl -L -o static/logo_mini.png "https://drive.google.com/uc?id=1_z4sgZNGziFXWZ3WksIvKJUjuAdSxXfP"
 
 RUN npm run build
 
