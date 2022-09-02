@@ -21,10 +21,12 @@ class Psychic:
         cursor.execute("SELECT * FROM click_probs")
 
         for record in cursor:
-            prefix, click, count = record
-            if prefix not in prefix_stats:
-                prefix_stats[prefix] = {}
-            prefix_stats[prefix][click] = count
+            history, click, count = record
+            for i in range(len(history) + 1):
+                prefix = history[i:]
+                if prefix not in prefix_stats:
+                    prefix_stats[prefix] = {"L": 0, "R": 0}
+                prefix_stats[prefix][click] += count
             logging.info(f"Ingested record: {record}")
 
         conn.close()
@@ -32,14 +34,15 @@ class Psychic:
         return prefix_stats
 
     def predict(self, history):
-        for i in range(len(history)):
+        for i in range(len(history) + 1):
             prefix = history[i:]
             if prefix in self.prefix_stats:
-                l_weight = self.prefix_stats[prefix].get("L", 0) + 1
-                r_weight = self.prefix_stats[prefix].get("R", 0) + 1
+                l_weight = self.prefix_stats[prefix]["L"] + 1
+                r_weight = self.prefix_stats[prefix]["R"] + 1
                 total_weight = l_weight + r_weight
-                probs = [l_weight / total_weight, r_weight / total_weight]
-                logging.info(f"Sampling for {prefix} prefix at {probs} probs")
-                return np.random.choice(["L", "R"], p=probs)
+                if total_weight > 25:
+                    probs = [l_weight / total_weight, r_weight / total_weight]
+                    logging.info(f"Sampling for {prefix} prefix at {probs} probs")
+                    return np.random.choice(["L", "R"], p=probs)
 
         return np.random.choice(["L", "R"])
