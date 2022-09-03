@@ -32,7 +32,7 @@ tilt up
 
 When services are initialized the following ports will be used:
 * localhost:10350 for Tilt UI (to check all services)
-* localhost:3000 for frontend (to play the game)
+* localhost:3000/psychic_robot_battle for frontend (to play the game)
 * localhost:8080 for psychic model (FastAPI endpoint)
 * localhost:30165 for pgadmin (to check timescaledb logs)
 * localhost:6379 for redis
