@@ -66,19 +66,18 @@ Credentials to access these services (when necessary) lie in kubernetes/secrets 
 
 ```
 git clone https://github.com/rlyapin/psychic_robot_battle.git
-cd psychic_robot_battle/production
 ```
 
 3. Install docker and kubeadm on all cluster nodes
 
 ```
-bash worker-setup.sh
+bash psychic_robot_battle/production/worker-setup.sh
 ```
 
 4. Pick one node to be a control plane and initialize a kubernetes cluster
 
 ```
-bash control-plane-setup.sh
+bash psychic_robot_battle/production/control-plane-setup.sh
 ```
 
 5. Connect worker nodes to control plane
@@ -88,7 +87,7 @@ After `control-plane-setup.sh` script is done it prints `kubeadm join` instructi
 6. Initialize necessary services from control plane node
 
 ```
-bash cluster-setup.sh FLOATING-IP EMAIL DEPLOYMODE
+bash psychic_robot_battle/production/cluster-setup.sh FLOATING-IP EMAIL DEPLOYMODE
 ```
 * FLOATING-IP is external IP for the service which DNS is pointing to
 * EMAIL is email used to get TLS certificate
@@ -102,6 +101,10 @@ kubectl get pods -o wide --all-namespaces
 ```
 In case of Hetzner cloud floating IP can be assigned to a target node in WebUI
 
+Currently setup script tries to handle TLS before Floating IP is assigned to a specific node - that may prevent the cert manager from successfully creating a certificate. If that happens deleting a certificate would force a cert manager to reissue it
+```
+kubectl delete certificate letsencrypt-prod-tls
+```
 8. Check deployed application at https://[your-domain-name]/psychic_robot_battle
 
 ## Concept art
