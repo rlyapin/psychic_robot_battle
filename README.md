@@ -101,11 +101,11 @@ kubectl get pods -o wide --all-namespaces
 ```
 In case of Hetzner cloud floating IP can be assigned to a target node in WebUI
 
-Currently setup script tries to handle TLS before Floating IP is assigned to a specific node - that may prevent the cert manager from successfully creating a certificate. If that happens deleting a certificate would force a cert manager to reissue it
+8. Deploy ingress for frontend server
 ```
-kubectl delete certificate letsencrypt-prod-tls
+kubectl apply -f psychic_robot_battle/kubernetes/ingress/frontend.yaml
 ```
-8. Check deployed application at https://[your-domain-name]/psychic_robot_battle
+After running this command application should be accessible at https://[your-domain-name]/psychic_robot_battle
 
 ## Concept art
 

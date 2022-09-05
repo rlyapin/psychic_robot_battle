@@ -74,4 +74,5 @@ kubectl apply -f psychic_robot_battle/kubernetes/ingress/metallb.yaml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=ingress-nginx -l app.kubernetes.io/component=controller -n ingress-nginx
 sed -i -e "s=DEPLOYMODE=$deploymode=g" psychic_robot_battle/kubernetes/ingress/frontend.yaml
-kubectl apply -f psychic_robot_battle/kubernetes/ingress/frontend.yaml
+# Place to configure Floating IP - if it is not set cert manager might fail for next command
+# kubectl apply -f psychic_robot_battle/kubernetes/ingress/frontend.yaml
