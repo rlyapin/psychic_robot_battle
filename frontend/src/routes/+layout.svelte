@@ -1,5 +1,6 @@
 <script>
-  import "../app.css"
+  import "normalize.css/normalize.css";
+  import "../app.css";
 </script>
 
 <main>
